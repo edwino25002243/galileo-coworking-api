@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://galileo_user:galileo_password@db:5432/galileo_coworking?schema=public
+      - JWT_SECRET=mi_clave_super_secreta_galileo_2026
+    depends_on:
+      - db
+      - redis
+    networks:
+      - galileo_network
+
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5444:5432"
+    environment:
+      - POSTGRES_USER=galileo_user
+      - POSTGRES_PASSWORD=galileo_password
+      - POSTGRES_DB=galileo_coworking
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - galileo_network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - galileo_network
+
+networks:
+  galileo_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
